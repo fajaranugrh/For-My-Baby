@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Baby</title>
+<!-- Pacifico Font -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-family: 'Pacifico', cursive;
+    background: radial-gradient(ellipse at center, #0b0c2a 0%, #000 100%);
+    color: white;
+    text-align: center;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .moon {
+    position: absolute;
+    left: 50%;
+    bottom: -200px; 
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+    border-radius: 50%;
+    box-shadow: 0 0 50px #fff;
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: bottom 3s ease-out, opacity 3s ease-out;
+  }
+
+  .moon.show {
+    bottom: 75%; 
+    opacity: 1;
+    animation: floatMoon 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatMoon {
+    0% { transform: translateX(-50%) translateY(0); }
+    100% { transform: translateX(-50%) translateY(20px); }
+  }
+
+  .message {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    font-size: 2.5em;
+    opacity: 0;
+    transition: opacity 1.5s, transform 1.5s;
+    white-space: nowrap;
+    font-family: 'Pacifico', cursive;
+  }
+
+  .message.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+
+  .message.first { top: calc(50% + 50px); }   
+  .message.second { top: calc(50% + 110px); }
+  .message.third { top: calc(50% + 170px); }
+  .message.fourth { top: calc(50% + 230px); }
+  .message.fifth { top: calc(50% + 290px); }
+
+  #clickBtn {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    font-family: 'Pacifico', cursive;
+    transform: translateX(-50%);
+    font-size: 3em;
+    padding: 12px 24px;
+    cursor: pointer;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.3s;
+  }
+
+  #clickBtn:hover {
+    background: rgba(255,255,255,0.3);
+  }
+</style>
+</head>
+<body>
+
+
+<audio id="bgMusic" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="starCanvas"></canvas>
+<div class="moon"></div>
+
+<button id="clickBtn">Klik ini yaa baby ☺️ </button>
+
+<div class="message first">Maafin aku yaa baby, aku nggak bermaksud bikin kamu marah 😔</div>
+<div class="message second">Aku cuma pengen kamu tau, kamu itu sangat berarti buat aku</div>
+<div class="message third">Aku sayang banget sama kamu baby</div>
+<div class="message fourth">Aku sayang kamu lebih dari kata - kata yang bisa aku ucapkan</div>
+<div class="message fifth">I love you to the moon and back baby 🌙</div>
+
+<script>
+// ==== Bintang Alam Semesta ====
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const numStars = 300;
+const stars = [];
+
+for(let i=0;i<numStars;i++){
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.5,
+    alpha: Math.random(),
+    speed: Math.random() * 0.05 + 0.01
+  });
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+  for(let i=0;i<stars.length;i++){
+    const s = stars[i];
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+    ctx.fill();
+    s.alpha += s.speed;
+    if(s.alpha > 1) s.alpha = 0;
+  }
+  requestAnimationFrame(drawStars);
+}
+
+drawStars();
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// ==== Animasi Bulan + Teks 5 langkah ====
+const messages = [
+  document.querySelector('.message.first'),
+  document.querySelector('.message.second'),
+  document.querySelector('.message.third'),
+  document.querySelector('.message.fourth'),
+  document.querySelector('.message.fifth')
+];
+
+const moon = document.querySelector('.moon');
+const btn = document.getElementById('clickBtn');
+const bgMusic = document.getElementById('bgMusic');
+
+btn.addEventListener('click', () => {
+  bgMusic.play();
+  btn.style.display = 'none';
+  moon.classList.add('show');
+
+  setTimeout(() => {
+    let delay = 500;
+    messages.forEach((msg, index) => {
+      setTimeout(() => {
+        msg.classList.add('show');
+        if(index > 0) messages[index-1].classList.remove('show');
+      }, delay);
+      delay += 3500;
+    });
+  }, 3000);
+});
+</script>
+
+</body>
+</html>
