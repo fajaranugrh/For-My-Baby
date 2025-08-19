@@ -1,186 +1,531 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For My Baby</title>
-<!-- Pacifico Font -->
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    font-family: 'Pacifico', cursive;
-    background: radial-gradient(ellipse at center, #0b0c2a 0%, #000 100%);
-    color: white;
-    text-align: center;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dear My Baby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ff7aa2;
+      --rose: #ff4d6d;
+      --bg1: #fff0f5;
+      --card: #ffffffcc;
+      --text: #2e2a2a;
+    }
 
-  canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, #ffe0ea 0%, transparent 60%),
+        radial-gradient(1000px 700px at 90% 20%, #ffd1dc 0%, transparent 60%),
+        linear-gradient(180deg, #fff5f8 0%, #ffe6ef 100%);
+      overflow: hidden;
+      cursor: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'>\
+<path fill='%23ff4d6d' d='M12 21s-6.716-3.905-9.428-7.74C.83 10.52 2.128 7 5.455 7c1.74 0 2.86.95 3.545 2.027C9.686 7.95 10.806 7 12.545 7c3.327 0 4.626 3.52 2.883 6.26C18.716 17.095 12 21 12 21z'/>\
+</svg>") 8 8, auto;
+    }
 
-  .moon {
-    position: absolute;
-    left: 50%;
-    bottom: -200px; 
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle at 30% 30%, #fff, #ccc);
-    border-radius: 50%;
-    box-shadow: 0 0 50px #fff;
-    opacity: 0;
-    transform: translateX(-50%);
-    transition: bottom 3s ease-out, opacity 3s ease-out;
-  }
+    .wrap {
+      position: relative;
+      z-index: 1; /* di atas layer hearts */
+      display: grid;
+      place-items: center;
+      min-height: 100dvh;
+      padding: 24px
+    }
 
-  .moon.show {
-    bottom: 75%; 
-    opacity: 1;
-    animation: floatMoon 6s ease-in-out infinite alternate;
-  }
+    @keyframes sparkHeart {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.9; }
+  100% { transform: scale(0); opacity: 0; }
+}
 
-  @keyframes floatMoon {
-    0% { transform: translateX(-50%) translateY(0); }
-    100% { transform: translateX(-50%) translateY(20px); }
-  }
+    /* ===== Floating Hearts Layer ===== */
+    .hearts {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .heart {
+      position: absolute;
+      bottom: -60px;
+      width: 18px;
+      height: 18px;
+      transform: rotate(45deg);
+      border-radius: 4px;
+      background: linear-gradient(145deg, var(--pink), var(--rose));
+      filter: drop-shadow(0 6px 14px rgba(255, 77, 109, 0.25));
+      opacity: 0.85;
+      animation-name: floatUp;
+      animation-iteration-count: 1;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-in;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+    }
+    .heart::before { top: -50%; left: 0; }
+    .heart::after  { left: -50%; top: 0; }
 
-  .message {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) scale(0.5);
-    font-size: 2.5em;
-    opacity: 0;
-    transition: opacity 1.5s, transform 1.5s;
-    white-space: nowrap;
-    font-family: 'Pacifico', cursive;
-  }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) translateX(0) rotate(45deg) scale(var(--scale, 1)); opacity: 0; }
+      10%  { opacity: 0.95; }
+      100% { transform: translateY(-120vh) translateX(var(--drift, 0)) rotate(45deg) scale(var(--scale, 1)); opacity: 0; }
+    }
 
-  .message.show {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-  }
+    /* Quiz */
+    .quiz { text-align: center; padding: 20px; }
+    .quiz h2 { margin-bottom: 20px; font-size: 22px; }
+    .quiz-buttons {
+      display: flex; justify-content: center; gap: 20px; position: relative;
+    }
+    .quiz button {
+      padding: 12px 24px; border: none; border-radius: 12px; font-size: 18px;
+      cursor: pointer; font-weight: 600; transition: transform 0.3s;
+    }
+    #yesBtn { background: var(--rose); color: #fff; box-shadow: 0 4px 12px #ff7aa260; }
+    #noBtn { background: #ddd; color: #444; position: absolute; }
 
-  .message.first { top: calc(50% + 50px); }   
-  .message.second { top: calc(50% + 110px); }
-  .message.third { top: calc(50% + 170px); }
-  .message.fourth { top: calc(50% + 230px); }
-  .message.fifth { top: calc(50% + 290px); }
+    /* Slideshow */
+    .card {
+      width: min(960px, 92vw);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid #ffffff88;
+      border-radius: 28px;
+      box-shadow: 0 20px 60px #ff7aa233;
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
 
-  #clickBtn {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    font-family: 'Pacifico', cursive;
-    transform: translateX(-50%);
-    font-size: 3em;
-    padding: 12px 24px;
-    cursor: pointer;
-    border: 2px solid #fff;
-    border-radius: 12px;
-    color: white;
-    background: rgba(255,255,255,0.1);
-    transition: background 0.3s;
-  }
+    .slider {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
 
-  #clickBtn:hover {
-    background: rgba(255,255,255,0.3);
-  }
-</style>
+    .slides {
+      display: flex;
+      transition: transform 1s ease-in-out; /* smooth */
+    }
+
+    .polaroid {
+      position: relative;
+      background: #fff;
+      width: 300px;
+      height: 400px;
+      padding: 14px 14px 40px;
+     
+      border-radius: 8px;
+      margin-right: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-2deg);
+      flex-shrink: 0;
+    }
+
+    .polaroid img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      display: block;
+    }
+
+    /* Map */
+    #mapSection { width: 100%; height: 100vh; display: none; }
+
+
+    .typing {
+  opacity: 0;
+  font-weight: 600;
+  font-size: 20px;
+  margin: 12px 0;
+  transition: opacity 1s ease;
+}
+
+.typing.show {
+  opacity: 1;
+}
+
+@keyframes heartFloat {
+  0% { transform: translateY(0) scale(0.5); opacity: 0.8; }
+  100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+}
+
+    /* Skip button */
+    #skipBtn {
+
+      display:none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 18px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      background: var(--pink);
+      color: white;
+      z-index: 10;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <audio id="bgMusic" src="./heatwave_always_forever.mp3" loop></audio>
+  <div class="hearts" id="hearts"></div>
 
+  <main class="wrap">
+    <!-- QUIZ -->
+    <div class="quiz">
+      <h2>Apakah babysitter sayang sama baby inii? 🥺</h2>
+      <div class="quiz-buttons">
+        <button id="yesBtn">Ya 💖</button>
+        <button id="noBtn">Tidak 🙈</button>
+      </div>
+    </div>
 
-<audio id="bgMusic" loop>
-  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
-</audio>
+    <button id="skipBtn">Skip 🚀</button>
 
-<canvas id="starCanvas"></canvas>
-<div class="moon"></div>
+    <!-- MAP -->
+    <div id="mapSection"></div>
 
-<button id="clickBtn">Klik ini yaa baby ☺️ </button>
+    <!-- SLIDESHOW -->
+    <section class="card slideshow" style="display:none;">
+      <div class="slider">
+       <div class="slides" id="slides"></div>
 
-<div class="message first">Maafin aku yaa baby, aku nggak bermaksud bikin kamu marah 😔</div>
-<div class="message second">Aku cuma pengen kamu tau, kamu itu sangat berarti buat aku</div>
-<div class="message third">Aku sayang banget sama kamu baby</div>
-<div class="message fourth">Aku sayang kamu lebih dari kata - kata yang bisa aku ucapkan</div>
-<div class="message fifth">I love you to the moon and back baby 🌙</div>
+      </div>
 
-<script>
-// ==== Bintang Alam Semesta ====
-const canvas = document.getElementById('starCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+      <div id="textSection" style="display:none; margin-top:20px; text-align:center;">
+  <h2 id="line1" class="typing"></h2>
+  <h3 id="line2" class="typing"></h3>
+  <h3 id="line3" class="typing"></h3>
+  <h3 id="line4" class="typing"></h3>
+  <h3 id="line5" class="typing"></h3>
+</div>
+    
+    </section>
+    
+  </main>
 
-const numStars = 300;
-const stars = [];
+  <script>
+    // ===== Hearts =====
+    const heartsLayer = document.getElementById('hearts');
+ function spawnHeart() {
+  const heart = document.createElement('span');
+  heart.className = 'heart';
+  
+  const size = 12 + Math.random() * 28;
+  heart.style.width = size + 'px';
+  heart.style.height = size + 'px';
+  heart.style.left = Math.random() * 100 + '%';
+  
+  // random scale & drift
+  heart.style.setProperty('--scale', (0.7 + Math.random() * 1.3).toFixed(2));
+  heart.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
+  
+  // random color gradient
+  const palette = [
+    ['#ff7aa2', '#ff4d6d'],
+    ['#ff9fba', '#ff6b88'],
+    ['#ffc2d4', '#ff7aa2']
+  ];
+  const pick = palette[Math.floor(Math.random() * palette.length)];
+  heart.style.background = `linear-gradient(145deg, ${pick[0]}, ${pick[1]})`;
 
-for(let i=0;i<numStars;i++){
-  stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    radius: Math.random() * 1.5,
-    alpha: Math.random(),
-    speed: Math.random() * 0.05 + 0.01
+  // random duration
+  const dur = 6 + Math.random() * 6;
+  heart.style.animationDuration = dur + 's';
+  
+  heartsLayer.appendChild(heart);
+  
+  setTimeout(() => heart.remove(), dur * 1000);
+}
+
+// spawn heart terus menerus
+setInterval(spawnHeart, 300);
+    const HEARTS_INTERVAL = setInterval(spawnHeart, 300);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clearInterval(HEARTS_INTERVAL); });
+
+    // ===== Tombol =====
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const quiz = document.querySelector(".quiz");
+    const slideshow = document.querySelector(".slideshow");
+    const mapSection = document.getElementById("mapSection");
+    const skipBtn = document.getElementById("skipBtn");
+    
+
+    noBtn.addEventListener("mouseenter", () => {
+      const randX = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
+      const randY = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
+      noBtn.style.position = "fixed";
+      noBtn.style.left = randX + "px";
+      noBtn.style.top = randY + "px";
+    });
+
+   const bgMusic = document.getElementById("bgMusic");
+
+yesBtn.addEventListener("click", () => {
+  quiz.style.display = "none";
+  mapSection.style.display = "block";
+  skipBtn.style.display = "block";
+  initMap();
+  showRoute();
+  bgMusic.play(); // mulai musik
+});
+
+skipBtn.addEventListener("click", () => {
+  mapSection.style.display = "none";
+  slideshow.style.display = "block";
+  skipBtn.style.display = "none";
+  startSlideshow();
+  bgMusic.play(); // mulai musik
+});
+
+    // ===== Google Maps =====
+    let map, directionsService, directionsRenderer;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("mapSection"), {
+        zoom: 15,
+        tilt: 45,
+        heading: 90,
+        mapTypeId: "roadmap",
+        center: { lat: -6.2, lng: 106.8 }
+      });
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer({ map: map, suppressMarkers: false });
+    }
+
+    function flySmooth(route) {
+      let step = 0;
+      function animateSegment(start, end, progress) {
+        const lat = start.lat() + (end.lat() - start.lat()) * progress;
+        const lng = start.lng() + (end.lng() - start.lng()) * progress;
+        const pos = new google.maps.LatLng(lat, lng);
+        map.setCenter(pos);
+        map.setZoom(18);
+        map.setTilt(70);
+        const heading = google.maps.geometry.spherical.computeHeading(start, end);
+        map.setHeading(heading);
+      }
+      function loop() {
+        if (step < route.length - 1) {
+          let start = route[step];
+          let end = route[step + 1];
+          let progress = 0;
+          function move() {
+            progress += 0.02;
+            if (progress <= 1) {
+              animateSegment(start, end, progress);
+              requestAnimationFrame(move);
+            } else {
+              step++;
+              loop();
+            }
+          }
+          move();
+        } else {
+          setTimeout(() => {
+            mapSection.style.display = "none";
+            slideshow.style.display = "block";
+            skipBtn.style.display = "none";
+            startSlideshow();
+          }, 1000);
+        }
+      }
+      loop();
+    }
+
+    function showRoute() {
+      const request = {
+        origin: { lat: -6.9377, lng: 107.7131 },
+        destination: { lat: -6.8920, lng: 107.6151 },
+        travelMode: google.maps.TravelMode.DRIVING
+      };
+      directionsService.route(request, (result, status) => {
+        if (status === "OK") {
+          directionsRenderer.setDirections(result);
+          const route = result.routes[0].overview_path;
+          flySmooth(route);
+        } else {
+          alert("Rute tidak ditemukan: " + status);
+        }
+      });
+    }
+
+   function typeWriter(element, text, speed) {
+  return new Promise((resolve) => {
+    let i = 0;
+    element.textContent = "";
+    const interval = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        resolve(); // selesai mengetik
+      }
+    }, speed);
   });
 }
 
-function drawStars(){
-  ctx.clearRect(0,0,canvas.width, canvas.height);
-  for(let i=0;i<stars.length;i++){
-    const s = stars[i];
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-    ctx.fill();
-    s.alpha += s.speed;
-    if(s.alpha > 1) s.alpha = 0;
+async function showTextAnimation() {
+  const textSection = document.getElementById("textSection");
+  textSection.style.display = "block";
+
+  const linesText = [
+    "Setiap momen aku sama kamu berharga banget buat aku baby",
+    "Setiap detik, menit, dan jam yang aku habiskan sama kamu adalah harta yang tak ternilai apapun",
+    "Setiap jalan yang kita tempuh, setiap foto yang kita abadikan, menjadi momen bahagia kita bersama",
+    "Aku sayang kamu lebih dari kata yang bisa aku ucapkan",
+    "Kamu adalah my cutest, prettiest, and sweetiest lovely baby"
+  ];
+
+  const lines = textSection.querySelectorAll(".typing");
+
+  for (let i = 0; i < lines.length; i++) {
+    lines[i].classList.add("show");
+    await typeWriter(lines[i], linesText[i], 50); // tunggu sampai selesai
+    spawnMiniHearts();
+    // ❌ jangan panggil showSpecialPhoto() di sini
   }
-  requestAnimationFrame(drawStars);
 }
 
-drawStars();
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
+// Floating mini hearts saat teks muncul
+function spawnMiniHearts() {
+  const heart = document.createElement("span");
+  heart.className = "heart";
+  heart.style.width = "12px";
+  heart.style.height = "12px";
+  heart.style.left = (50 + Math.random() * 40 - 20) + "%";
+  heart.style.bottom = "20px";
+  heart.style.background = `linear-gradient(145deg, #ff7aa2, #ff4d6d)`;
+  heart.style.animation = `heartFloat ${2 + Math.random() * 2}s ease forwards`;
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 4000);
+}
 
-// ==== Animasi Bulan + Teks 5 langkah ====
-const messages = [
-  document.querySelector('.message.first'),
-  document.querySelector('.message.second'),
-  document.querySelector('.message.third'),
-  document.querySelector('.message.fourth'),
-  document.querySelector('.message.fifth')
-];
+    // ===== Slideshow otomatis =====
+function startSlideshow() {
+  const slidesContainer = document.getElementById("slides");
 
-const moon = document.querySelector('.moon');
-const btn = document.getElementById('clickBtn');
-const bgMusic = document.getElementById('bgMusic');
+  // Clear dulu jika ada
+  slidesContainer.innerHTML = "";
 
-btn.addEventListener('click', () => {
-  bgMusic.play();
-  btn.style.display = 'none';
-  moon.classList.add('show');
+  // Generate images dari IMG_2137.jpg sampai IMG_2185.jpg
+  for (let i = 2137; i <= 2185; i++) {
+    const img = new Image();
+    img.src = `./IMG_${i}.jpg`;
+    img.alt = `Foto ${i}`;
 
+    img.onload = () => {
+      const div = document.createElement("div");
+      div.className = "polaroid";
+      div.appendChild(img);
+      slidesContainer.appendChild(div);
+    };
+
+    img.onerror = () => {
+      console.warn(`File ./IMG_${i}.jpg tidak ditemukan, dilewati.`);
+    };
+  }
+
+  // Jalankan otomatis sliding setelah preload
   setTimeout(() => {
-    let delay = 500;
-    messages.forEach((msg, index) => {
-      setTimeout(() => {
-        msg.classList.add('show');
-        if(index > 0) messages[index-1].classList.remove('show');
-      }, delay);
-      delay += 3500;
-    });
-  }, 3000);
-});
-</script>
+    const slides = slidesContainer;
+    const totalSlides = slides.children.length;
+    if (totalSlides === 0) return;
 
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      currentIndex++;
+      if (currentIndex >= totalSlides) {
+        clearInterval(interval);
+
+        // Hapus transform agar slides container kosong
+        slides.style.transform = `translateX(0px)`;
+
+        // Tampilkan satu foto spesial di tengah
+        showSpecialPhoto();
+      } else {
+        slides.style.transform = `translateX(-${currentIndex * (slides.children[0].offsetWidth + 20)}px)`;
+      }
+    }, 3000);
+  }, 1000);
+}
+
+function showSpecialPhoto() {
+  const slidesContainer = document.getElementById("slides");
+  slidesContainer.innerHTML = ""; // pastikan hanya ada satu foto
+
+  const div = document.createElement("div");
+  div.className = "polaroid";
+  div.style.margin = "0 auto"; // center
+  div.style.transform = "scale(0)";
+  div.style.transition = "transform 1s ease-out";
+
+  const img = new Image();
+  img.src = "./IMG_2133.jpg";
+  img.alt = "Special Photo";
+
+  img.onload = () => {
+    div.appendChild(img);
+    slidesContainer.appendChild(div);
+
+    requestAnimationFrame(() => {
+      div.style.transform = "scale(1)";
+      spawnSparkHearts(div);
+
+      // ✅ Panggil typing **sekali saja**
+      showTextAnimation();
+    });
+  };
+}
+
+function spawnSparkHearts(parent) {
+  for (let i = 0; i < 15; i++) { // spawn 15 heart kecil
+    const heart = document.createElement("span");
+    heart.className = "heart";
+    heart.style.width = "10px";
+    heart.style.height = "10px";
+    heart.style.position = "absolute";
+    heart.style.left = Math.random() * 80 + 10 + "%";
+    heart.style.top = Math.random() * 80 + 10 + "%";
+    heart.style.background = `linear-gradient(145deg, #ff7aa2, #ff4d6d)`;
+    heart.style.transform = "scale(0)";
+    heart.style.borderRadius = "50%";
+    heart.style.animation = `sparkHeart ${(0.8 + Math.random())}s ease forwards`;
+
+    parent.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 2000);
+  }
+}
+
+
+
+  </script>
+
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUrql8aGRboUOo1B7XjxS2N4HQhRtN-ew&callback=initMap&libraries=geometry">
+  </script>
 </body>
 </html>
