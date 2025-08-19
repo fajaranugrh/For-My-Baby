@@ -202,7 +202,7 @@
       </div>
     </div>
 
-    <button id="skipBtn">Skip 🚀</button>
+    <button id="skipBtn">Skip</button>
 
     <!-- MAP -->
     <div id="mapSection"></div>
@@ -433,7 +433,7 @@ function startSlideshow() {
   // Generate images dari IMG_2137.jpg sampai IMG_2185.jpg
   for (let i = 2137; i <= 2185; i++) {
     const img = new Image();
-    img.src = `./IMG_${i}.jpg`;
+   img.src = `/images/IMG_${i}.jpg`;
     img.alt = `Foto ${i}`;
 
     img.onload = () => {
